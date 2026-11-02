@@ -23,6 +23,8 @@ enum SignInType {
 }
 
 const Login = () => {
+  // Phone Number: Any number from +1 201 555 0100 to +1 201 555 0199 (e.g., +12015550100)
+  // Verification Code: Always 424242
   const [countryCode, setCountryCode] = useState("+91");
   const [phoneNumber, setPhoneNumber] = useState("");
 

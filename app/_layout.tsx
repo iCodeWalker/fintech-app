@@ -4,10 +4,10 @@ import { useAuthViewState } from "@clerk/expo/native-components";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { Ionicons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
-import { Link, Stack, useRouter } from "expo-router";
+import { Link, Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { StatusBar, TouchableOpacity } from "react-native";
+import { StatusBar, Text, TouchableOpacity } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
@@ -29,6 +29,7 @@ const InitialLayout = () => {
   const router = useRouter();
 
   const { isLoaded, isAuthFlowComplete } = useAuthViewState();
+  const segments = useSegments();
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
@@ -42,11 +43,20 @@ const InitialLayout = () => {
   }, [loaded]);
 
   useEffect(() => {
-    console.log("isAuthFlowComplete:", isAuthFlowComplete);
+    if (!isLoaded) return;
+
+    const inAuthGroup = segments[0] === "(authenticated)";
+
+    // User is on login page.
+    if (isAuthFlowComplete && !inAuthGroup) {
+      router.replace("/(authenticated)/(tabs)/home");
+    } else if (!isAuthFlowComplete) {
+      router.replace("/");
+    }
   }, [isAuthFlowComplete]);
 
-  if (!loaded) {
-    return null;
+  if (!loaded || !isLoaded) {
+    return <Text>Loading...</Text>;
   }
 
   return (
@@ -112,6 +122,13 @@ const InitialLayout = () => {
               <Ionicons name="arrow-back" size={28} color={Colors.primary} />
             </TouchableOpacity>
           ),
+        }}
+      />
+
+      <Stack.Screen
+        name="(authenticated)/(tabs)"
+        options={{
+          headerShown: false,
         }}
       />
     </Stack>
