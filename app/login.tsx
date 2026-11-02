@@ -1,8 +1,11 @@
 import Colors from "@/constants/Colors";
 import { defaultStyles } from "@/constants/Styles";
+import { isClerkAPIResponseError, useSignIn } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -25,8 +28,48 @@ const Login = () => {
 
   const keyboardVerticalOffset = Platform.OS === "ios" ? 90 : 100;
 
-  const handleLogin = (type: SignInType) => {
+  const { signIn, errors } = useSignIn();
+  const router = useRouter();
+
+  const handleLogin = async (type: SignInType) => {
     if (type === SignInType.Phone) {
+      try {
+        const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+        // 1. Initiate sign-in with phone number
+        const { error } = await signIn.create({
+          identifier: fullPhoneNumber,
+        });
+
+        if (error) {
+          console.error(JSON.stringify(error, null, 2));
+          return;
+        }
+
+        // 2. Send SMS OTP code
+        if (!error) await signIn.phoneCode.sendCode({ phoneNumber });
+
+        // 3. Navigate to your verify screen
+
+        router.push({
+          pathname: "/verify/[phone]",
+          params: { phone: fullPhoneNumber, signin: "true" },
+        });
+      } catch (error) {
+        console.error("Error signing in:", error);
+        if (isClerkAPIResponseError(error)) {
+          if (error.errors[0]?.code === "form_identifier_not_found") {
+            Alert.alert(
+              "Error",
+              "This phone number is not registered. Please sign up first.",
+            );
+          } else {
+            Alert.alert(
+              "Error",
+              error.errors[0]?.longMessage ?? "Failed to send code",
+            );
+          }
+        }
+      }
     }
   };
   return (

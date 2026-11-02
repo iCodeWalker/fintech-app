@@ -1,8 +1,10 @@
 import Colors from "@/constants/Colors";
 import { defaultStyles } from "@/constants/Styles";
-import { Link } from "expo-router";
+import { useSignUp } from "@clerk/expo";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -13,13 +15,40 @@ import {
 } from "react-native";
 
 const Signup = () => {
-  const [countryCode, setCountryCode] = useState("+91");
+  const { signUp } = useSignUp();
+
+  const [countryCode, setCountryCode] = useState("+1");
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const keyboardVerticalOffset = Platform.OS === "ios" ? 90 : 100;
   const behavior = Platform.OS === "ios" ? "padding" : "height";
 
-  const handleSignUp = () => {};
+  const router = useRouter();
+
+  const handleSignUp = async () => {
+    if (!signUp) return;
+    const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+    // 1. Create the sign-up attempt
+    const { error: createError } = await signUp.create({
+      phoneNumber: fullPhoneNumber,
+    });
+    if (createError) {
+      Alert.alert("Sign Up Error", createError.message);
+      return;
+    }
+    // 2. Send the SMS OTP code
+    const { error: sendError } = await signUp.verifications.sendPhoneCode();
+    if (sendError) {
+      Alert.alert("SMS sent Error", sendError.message);
+      return;
+    }
+    // 3. Navigate to verify screen
+    router.push({
+      pathname: "/verify/[phone]",
+      params: { phone: fullPhoneNumber },
+    });
+  };
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
