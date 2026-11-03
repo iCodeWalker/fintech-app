@@ -1,5 +1,6 @@
 import Dropdown from "@/components/Dropdown";
 import RoundButton from "@/components/RoundButton";
+import WidgetList from "@/components/SortableList/WidgetList";
 import Colors from "@/constants/Colors";
 import { defaultStyles } from "@/constants/Styles";
 import { useBalanceStore } from "@/store/balanceStore";
@@ -76,13 +77,15 @@ const Home = () => {
             );
           })}
       </View>
+      <Text style={defaultStyles.sectionHeader}>Widgets</Text>
+      <WidgetList />
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   account: {
-    margin: 80,
+    margin: 60,
     alignItems: "center",
   },
   row: {
