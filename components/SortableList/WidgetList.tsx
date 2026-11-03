@@ -20,7 +20,7 @@ const tiles = [
 
 const WidgetList = () => {
   return (
-    <View style={{ paddingHorizontal: MARGIN }}>
+    <View style={{ paddingHorizontal: MARGIN, marginBottom: 80 }}>
       <SortableList
         editing={true}
         onDragEnd={(positions: any) =>
