@@ -3,15 +3,18 @@ import { ClerkProvider } from "@clerk/expo";
 import { useAuthViewState } from "@clerk/expo/native-components";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { Ionicons } from "@expo/vector-icons";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Link, Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { StatusBar, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+// Create a client
+const queryClient = new QueryClient();
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -60,8 +63,15 @@ const InitialLayout = () => {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+    <Stack
+      screenOptions={{
+        statusBarStyle: "dark", // <--- Default for all screens in the app
+      }}
+    >
+      <Stack.Screen
+        name="index"
+        options={{ headerShown: false, statusBarStyle: "light" }}
+      />
       <Stack.Screen
         name="signup"
         options={{
@@ -131,6 +141,35 @@ const InitialLayout = () => {
           headerShown: false,
         }}
       />
+
+      <Stack.Screen
+        name="(authenticated)/crypto/[id]"
+        options={{
+          title: "",
+          headerLargeTitleEnabled: true,
+          headerTransparent: true,
+          headerLargeTitle: true,
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={28} color={Colors.primary} />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <TouchableOpacity>
+                <Ionicons
+                  name="notifications-outline"
+                  size={30}
+                  color={Colors.dark}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Ionicons name="star-outline" size={30} color={Colors.dark} />
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
+      />
     </Stack>
   );
 };
@@ -141,10 +180,12 @@ const RootLayoutNav = () => {
       publishableKey={CLERK_PUBLISHABLE_KEY}
       tokenCache={tokenCache}
     >
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <StatusBar barStyle="light-content" />
-        <InitialLayout />
-      </GestureHandlerRootView>
+      <QueryClientProvider client={queryClient}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          {/* <StatusBar barStyle="dark-content" /> */}
+          <InitialLayout />
+        </GestureHandlerRootView>
+      </QueryClientProvider>
     </ClerkProvider>
   );
 };

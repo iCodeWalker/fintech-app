@@ -45,7 +45,11 @@ const Home = () => {
           text={"Exchange"}
           onPress={clearTransactions}
         />
-        <RoundButton icon={"list"} text={"Details"} onPress={onAddMoney} />
+        <RoundButton
+          icon={"list"}
+          text={"Details"}
+          onPress={clearTransactions}
+        />
         <Dropdown />
       </View>
 
@@ -85,6 +89,7 @@ const Home = () => {
             );
           })}
       </View>
+      {/* Widgets list */}
       <Text style={defaultStyles.sectionHeader}>Widgets</Text>
       <WidgetList />
     </ScrollView>

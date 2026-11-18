@@ -1,8 +1,8 @@
 import Colors from "@/constants/Colors";
 import { defaultStyles } from "@/constants/Styles";
-import { useAssets } from "expo-asset";
+import { useAssets } from "expo-asset"; // Package to load the video asset
 import { Link } from "expo-router";
-import { useVideoPlayer, VideoView } from "expo-video";
+import { useVideoPlayer, VideoView } from "expo-video"; // Package to run the video
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const Page = () => {
@@ -41,15 +41,7 @@ const Page = () => {
           asChild
         >
           <TouchableOpacity>
-            <Text
-              style={{
-                fontSize: 22,
-                fontWeight: "500",
-                color: "white",
-              }}
-            >
-              Log In
-            </Text>
+            <Text style={styles.loginButtonText}>Log In</Text>
           </TouchableOpacity>
         </Link>
 
@@ -93,6 +85,11 @@ const styles = StyleSheet.create({
     gap: 20,
     marginBottom: 60,
     paddingHorizontal: 20,
+  },
+  loginButtonText: {
+    fontSize: 22,
+    fontWeight: "500",
+    color: "white",
   },
   buttonText: {
     fontSize: 22,
