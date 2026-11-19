@@ -15,6 +15,13 @@ export const UserInactivityProvider = ({ children }: any) => {
   const { isAuthFlowComplete } = useAuthViewState();
   const { isSignedIn } = useAuth();
 
+  // Use a ref for auth status so handleAppStateChange never suffers from stale closures
+  const isUserAuthenticated = useRef(Boolean(isSignedIn || isAuthFlowComplete));
+
+  useEffect(() => {
+    isUserAuthenticated.current = Boolean(isSignedIn || isAuthFlowComplete);
+  }, [isSignedIn, isAuthFlowComplete]);
+
   useEffect(() => {
     const subscription = AppState.addEventListener(
       "change",
@@ -27,19 +34,28 @@ export const UserInactivityProvider = ({ children }: any) => {
   }, []);
 
   const handleAppStateChange = async (nextAppState: AppStateStatus) => {
-    if (nextAppState === "background") {
-      recordStartTime();
-    } else if (
-      nextAppState === "active" &&
-      appState.current?.match(/background/)
+    // When the app leaves the active/foreground state (transitions to inactive or background)
+    if (
+      nextAppState.match(/inactive|background/) &&
+      appState.current === "active"
     ) {
-      const elpasedTime = Date.now() - (storage.getNumber("startTime") || 0);
+      recordStartTime();
+    }
+    // When returning to active/foreground from either inactive or background
+    else if (
+      nextAppState === "active" &&
+      appState.current?.match(/inactive|background/)
+    ) {
+      const startTime = storage.getNumber("startTime") || 0;
+      const elapsedTime = Date.now() - startTime;
+      console.log(
+        `[UserInactivity] Inactivity elapsed: ${elapsedTime}ms (Auth: ${isUserAuthenticated.current})`,
+      );
 
-      if (elpasedTime > 3000 && isSignedIn) {
+      if (elapsedTime > 3000 && isUserAuthenticated.current && startTime > 0) {
         router.replace("/(authenticated)/(modals)/lock");
       }
     }
-    console.log(nextAppState);
 
     appState.current = nextAppState;
   };

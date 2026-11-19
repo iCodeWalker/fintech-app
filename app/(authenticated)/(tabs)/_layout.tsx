@@ -75,7 +75,7 @@ const Layout = () => {
           headerTransparent: true,
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="lifestyle"
         options={{
           title: "Lifestyle",
@@ -87,7 +87,7 @@ const Layout = () => {
             />
           ),
         }}
-      />
+      /> */}
     </Tabs>
   );
 };

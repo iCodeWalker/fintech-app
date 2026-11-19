@@ -16,8 +16,8 @@ import Animated, {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const LockScreen = () => {
-  const user = useUser();
-  const [firstName, setFirstName] = useState("Vaibhav");
+  const { user } = useUser();
+  const [firstName, setFirstName] = useState(user?.firstName);
   const [code, setCode] = useState<number[]>([]);
   const router = useRouter();
 

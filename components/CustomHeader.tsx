@@ -1,6 +1,7 @@
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
+import { Link } from "expo-router";
 import {
   StyleSheet,
   Text,
@@ -15,11 +16,13 @@ const CustomHeader = () => {
   return (
     <BlurView intensity={80} tint="extraLight" style={{ paddingTop: top }}>
       <View style={styles.container}>
-        <TouchableOpacity style={styles.roundBtn}>
-          <Text style={{ color: "#fff", fontWeight: "500", fontSize: 16 }}>
-            VK
-          </Text>
-        </TouchableOpacity>
+        <Link href={"/(authenticated)/(modals)/account"} asChild>
+          <TouchableOpacity style={styles.roundBtn}>
+            <Text style={{ color: "#fff", fontWeight: "500", fontSize: 16 }}>
+              VK
+            </Text>
+          </TouchableOpacity>
+        </Link>
         <View style={styles.searchSection}>
           <Ionicons
             name="search"
