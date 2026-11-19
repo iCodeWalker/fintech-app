@@ -8,9 +8,10 @@ import { useFonts } from "expo-font";
 import { Link, Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
+import { UserInactivityProvider } from "./context/UserInactivity";
 
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 // Create a client
@@ -59,7 +60,12 @@ const InitialLayout = () => {
   }, [isAuthFlowComplete]);
 
   if (!loaded || !isLoaded) {
-    return <Text>Loading...</Text>;
+    return (
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
+        <ActivityIndicator size={"large"} color={Colors.primary} />
+      </View>
+    );
   }
 
   return (
@@ -170,6 +176,14 @@ const InitialLayout = () => {
           ),
         }}
       />
+
+      <Stack.Screen
+        name="(authenticated)/(modals)/lock"
+        options={{
+          headerShown: false,
+          animation: "none",
+        }}
+      />
     </Stack>
   );
 };
@@ -181,10 +195,12 @@ const RootLayoutNav = () => {
       tokenCache={tokenCache}
     >
       <QueryClientProvider client={queryClient}>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          {/* <StatusBar barStyle="dark-content" /> */}
-          <InitialLayout />
-        </GestureHandlerRootView>
+        <UserInactivityProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            {/* <StatusBar barStyle="dark-content" /> */}
+            <InitialLayout />
+          </GestureHandlerRootView>
+        </UserInactivityProvider>
       </QueryClientProvider>
     </ClerkProvider>
   );
